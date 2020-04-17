@@ -1,0 +1,5 @@
+name: MobEconomy
+version: 1.0.0
+main: me.alecdiaz.mobeconomy.MobEconomy
+depend:
+  - Vault
