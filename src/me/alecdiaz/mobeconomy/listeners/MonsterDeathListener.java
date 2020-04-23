@@ -14,7 +14,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 import java.util.Random;
-import java.util.Set;
 
 public class MonsterDeathListener implements Listener {
     private final MobEconomy mobEconomy;
