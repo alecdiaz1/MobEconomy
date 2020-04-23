@@ -4,6 +4,8 @@ import me.alecdiaz.mobeconomy.MobEconomy;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -12,8 +14,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 import java.util.Random;
+import java.util.Set;
 
-public class HostileMobListener implements Listener {
+public class MonsterDeathListener implements Listener {
+    private final MobEconomy mobEconomy;
+
+    public MonsterDeathListener(MobEconomy mobEconomy) {
+        this.mobEconomy = mobEconomy;
+    }
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent e){
@@ -22,18 +30,25 @@ public class HostileMobListener implements Listener {
         Player p = e.getEntity().getKiller();
         Random random = new Random();
 
-        if (slainEntity instanceof Monster) {
-            double chance = random.nextDouble();
-            double reward = 0;
-            
-            if (chance < .80) {
-                reward = 1.0;
-            } else if (.80 <= chance && chance < 90) {
-                reward = 2.0;
-            } else if (.90 <= chance && chance < .99){
-                reward = 3.0;
+        FileConfiguration config = mobEconomy.getConfig();
+        String mobName = slainEntity.getName().toUpperCase();
+
+        double chance = random.nextDouble();
+        double reward;
+
+        if (slainEntity instanceof Monster || slainEntity instanceof Boss) {
+            if (config.contains(mobName)) {
+                reward = config.getDouble(mobName);
             } else {
-                reward = 4.0;
+                if (slainEntity instanceof Monster) {
+                    reward = 15;
+                } else {
+                    reward = 50;
+                }
+            }
+
+            if (chance >= .75) {
+                reward = reward * 1.4;
             }
 
             EconomyResponse response = eco.depositPlayer(p, reward);
@@ -44,5 +59,4 @@ public class HostileMobListener implements Listener {
             }
         }
     }
-
 }

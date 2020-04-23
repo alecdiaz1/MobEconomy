@@ -1,8 +1,9 @@
 package me.alecdiaz.mobeconomy;
 
-import me.alecdiaz.mobeconomy.listeners.HostileMobListener;
+import me.alecdiaz.mobeconomy.listeners.MonsterDeathListener;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,8 +19,12 @@ public final class MobEconomy extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-//        Bukkit.getPluginManager().registerEvents(new BreakBlockListener(), this);
-        Bukkit.getPluginManager().registerEvents(new HostileMobListener(), this);
+        getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "\n\nMobEconomy enabled\n\n");
+        Bukkit.getPluginManager().registerEvents(new MonsterDeathListener(this), this);
+    }
+
+    public void onDisable() {
+        getServer().getConsoleSender().sendMessage(ChatColor.RED + "\n\nMobEconomy disabled\n\n");
     }
 
     private boolean setupEconomy()
@@ -35,5 +40,4 @@ public final class MobEconomy extends JavaPlugin {
     public static Economy getEconomy() {
         return economy;
     }
-
 }
