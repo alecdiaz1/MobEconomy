@@ -41,14 +41,14 @@ public class MonsterDeathListener implements Listener {
                 reward = config.getDouble(mobName);
             } else {
                 if (slainEntity instanceof Monster) {
-                    reward = 15;
+                    reward = config.getDouble("DEFAULT");
                 } else {
-                    reward = 50;
+                    reward = config.getDouble("DEFAULT_BOSS");
                 }
             }
 
             if (chance >= .75) {
-                reward = reward * 1.4;
+                reward = reward * 1.5;
             }
 
             EconomyResponse response = eco.depositPlayer(p, reward);
