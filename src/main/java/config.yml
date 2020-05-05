@@ -1,4 +1,5 @@
 # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/Monster.html
 # BLAZE: 40
-DEFAULT: 8
+FARMED: 5
+DEFAULT: 20
 DEFAULT_BOSS: 30
