@@ -4,6 +4,8 @@ import me.alecdiaz.mobeconomy.MobEconomy;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
@@ -18,44 +20,60 @@ import java.util.Random;
 public class MonsterDeathListener implements Listener {
     private final MobEconomy mobEconomy;
 
-    public MonsterDeathListener(MobEconomy mobEconomy) {
-        this.mobEconomy = mobEconomy;
-    }
+    public MonsterDeathListener(MobEconomy mobEconomy) { this.mobEconomy = mobEconomy; }
 
     @EventHandler
-    public void onEntityDeath(EntityDeathEvent e){
+    public void onEntityDeath(EntityDeathEvent e) {
         Economy eco = MobEconomy.getEconomy();
         Entity slainEntity = e.getEntity();
         Player p = e.getEntity().getKiller();
         Random random = new Random();
 
         FileConfiguration config = mobEconomy.getConfig();
-        String mobName = slainEntity.getName().toUpperCase();
 
-        double chance = random.nextDouble();
+        double bonusChance = random.nextDouble();
         double reward;
 
-        if (slainEntity instanceof Monster || slainEntity instanceof Boss) {
-            if (config.contains(mobName)) {
-                reward = config.getDouble(mobName);
+        if (slainEntity instanceof Monster) {
+            Block middle = e.getEntity().getLocation().getBlock();
+            if (isMobInFarm(middle)) {
+                reward = config.getDouble("FARMED");
+
+                double noDropChance = random.nextDouble();
+                if (noDropChance <= .40) {
+                    e.getDrops().clear();
+                }
             } else {
-                if (slainEntity instanceof Monster) {
-                    reward = config.getDouble("DEFAULT");
-                } else {
-                    reward = config.getDouble("DEFAULT_BOSS");
+                reward = config.getDouble("DEFAULT");
+            }
+
+            if (bonusChance >= .75) {
+                reward *= 1.5;
+            }
+
+            try {
+                EconomyResponse response = eco.depositPlayer(p, reward);
+                if (response.transactionSuccess()){
+                    assert p != null;
+                    p.sendMessage(ChatColor.GREEN + eco.format(response.amount) + " earned for killing a " +
+                            slainEntity.getName());
+                }
+            } catch(NullPointerException ignored) {}
+        }
+    }
+
+    public boolean isMobInFarm(Block middle) {
+        int radius = 2;
+        for (int x = radius; x >= -radius; x--) {
+            for (int y = radius; y >= -radius; y--) {
+                for (int z = radius; z >= -radius; z--) {
+                    if (middle.getRelative(x, y, z).getType() == Material.HOPPER) {
+                        mobEconomy.getServer().broadcastMessage("died on hopper");
+                        return true;
+                    }
                 }
             }
-
-            if (chance >= .75) {
-                reward = reward * 1.5;
-            }
-
-            EconomyResponse response = eco.depositPlayer(p, reward);
-            if (response.transactionSuccess()){
-                assert p != null;
-                p.sendMessage(ChatColor.GREEN + eco.format(response.amount) + " earned for killing a " +
-                        slainEntity.getName());
-            }
         }
+        return false;
     }
 }
