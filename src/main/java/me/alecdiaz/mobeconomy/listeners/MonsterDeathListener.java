@@ -45,10 +45,10 @@ public class MonsterDeathListener implements Listener {
                 }
             } else {
                 reward = config.getDouble("DEFAULT");
-            }
 
-            if (bonusChance >= .75) {
-                reward *= 1.5;
+                if (bonusChance >= .75) {
+                    reward *= 1.5;
+                }
             }
 
             try {
@@ -68,7 +68,6 @@ public class MonsterDeathListener implements Listener {
             for (int y = radius; y >= -radius; y--) {
                 for (int z = radius; z >= -radius; z--) {
                     if (middle.getRelative(x, y, z).getType() == Material.HOPPER) {
-                        mobEconomy.getServer().broadcastMessage("died on hopper");
                         return true;
                     }
                 }
