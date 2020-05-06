@@ -5,9 +5,9 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Boss;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -67,7 +67,8 @@ public class MonsterDeathListener implements Listener {
         for (int x = radius; x >= -radius; x--) {
             for (int y = radius; y >= -radius; y--) {
                 for (int z = radius; z >= -radius; z--) {
-                    if (middle.getRelative(x, y, z).getType() == Material.HOPPER) {
+                    if (middle.getRelative(x, y, z).getType() == Material.HOPPER ||
+                        Tag.SLABS.getValues().contains(middle.getRelative(x, y, z).getType())) {
                         return true;
                     }
                 }
