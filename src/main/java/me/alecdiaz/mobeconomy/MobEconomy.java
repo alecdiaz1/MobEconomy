@@ -4,12 +4,16 @@ import me.alecdiaz.mobeconomy.listeners.MonsterDeathListener;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
 
 public final class MobEconomy extends JavaPlugin {
 
     private static Economy economy = null;
+    public static Plugin plugin = null;
 
     @Override
     public void onEnable() {
@@ -21,6 +25,7 @@ public final class MobEconomy extends JavaPlugin {
         }
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "\n\nMobEconomy enabled\n\n");
         Bukkit.getPluginManager().registerEvents(new MonsterDeathListener(this), this);
+        plugin = this;
     }
 
     public void onDisable() {
@@ -37,7 +42,7 @@ public final class MobEconomy extends JavaPlugin {
         return (economy != null);
     }
 
-    public static Economy getEconomy() {
-        return economy;
-    }
+    public static Economy getEconomy() { return economy; }
+
+    public static Plugin getInstance() { return plugin; }
 }
