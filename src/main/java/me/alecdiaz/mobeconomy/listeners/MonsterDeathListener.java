@@ -35,31 +35,56 @@ public class MonsterDeathListener implements Listener {
 
         FileConfiguration config = mobEconomy.getConfig();
 
-        PlayerConfig.create(p);
+        if (p != null) {
+            if (slainEntity instanceof Monster) {
+                PlayerConfig.create(p);
 
-        int killCount = PlayerConfig.get().getInt(chunk.toString());
+                double decayRate = config.getDouble("DECAY_RATE");
+                int decayTrigger = config.getInt("DECAY_TRIGGER");
+                int secondsForRecovery = config.getInt("SECONDS_FOR_RECOVERY");
+                double minReward = config.getDouble("MINIMUM_REWARD");
 
-        PlayerConfig.get().set(chunk.toString(), killCount + 1);
-        PlayerConfig.save();
+                int currentKillCount = PlayerConfig.get().getInt(chunk.toString() + ".killCount");
+                long lastKillTime = PlayerConfig.get().getLong(chunk.toString() + ".lastKillTime");
+                double elapsedTimeSeconds = (System.currentTimeMillis() - lastKillTime) / 1000.0;
+                int elapsedTimeMinutes = (int) (elapsedTimeSeconds / secondsForRecovery);
 
-        double bonusChance = random.nextDouble();
+                int newKillCount = currentKillCount - elapsedTimeMinutes;
 
-        // Exponential decay
-        double reward = config.getDouble("DEFAULT") * Math.pow((1-.05), killCount);
+                if (newKillCount < 0) {
+                    newKillCount = 0;
+                    PlayerConfig.get().set(chunk.toString() + ".killCount", newKillCount);
+                }
 
-        System.out.println(killCount);
+                PlayerConfig.get().set(chunk.toString() + ".killCount", newKillCount + 1);
+                PlayerConfig.get().set(chunk.toString() + ".lastKillTime", System.currentTimeMillis());
+                PlayerConfig.save();
 
-        if (bonusChance >= .75) {
-            reward *= 1.5;
-        }
+                double bonusChance = random.nextDouble();
+                double reward;
 
-        try {
-            EconomyResponse response = eco.depositPlayer(p, reward);
-            if (response.transactionSuccess()){
-                assert p != null;
-                p.sendMessage(ChatColor.GREEN + eco.format(response.amount) + " earned for killing a " +
-                        slainEntity.getName());
+                if (newKillCount > 10) {
+                    reward = config.getDouble("DEFAULT") * Math.pow((1 - decayRate), newKillCount - decayTrigger);
+                } else {
+                    reward = config.getDouble("DEFAULT");
+                }
+
+                if (reward < minReward) {
+                    reward = minReward;
+                }
+
+                if (bonusChance >= .75) {
+                    reward *= 1.5;
+                }
+
+                try {
+                    EconomyResponse response = eco.depositPlayer(p, reward);
+                    if (response.transactionSuccess()){
+                        p.sendMessage(ChatColor.GREEN + eco.format(response.amount) + " earned for killing a " +
+                                slainEntity.getName());
+                    }
+                } catch(NullPointerException ignored) {}
             }
-        } catch(NullPointerException ignored) {}
+        }
     }
 }

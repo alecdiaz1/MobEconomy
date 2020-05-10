@@ -16,6 +16,7 @@ public class PlayerConfig {
     static File df = MobEconomy.getInstance().getDataFolder();
 
     public static void create(Player p) {
+        assert p != null;
         cfile = new File(df, "player data" + File.separator + p.getUniqueId() + ".yml");
         if (!df.exists()) df.mkdir();
         if (!cfile.exists()) {

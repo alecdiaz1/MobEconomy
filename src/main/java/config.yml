@@ -1,5 +1,22 @@
 # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/Monster.html
+# https://mathbitsnotebook.com/Algebra2/Exponential/EXGrowthDecay.html
+
+# How reward recovers:
+# After a minute of the player not killing a mob in that chunk, the logged number of mobs killed in that chunk decreases
+# by one. Then the one minute timer resets.
+
+# reward = DEFAULT * (1 - DECAY_RATE)^Mobs killed in chunk after DECAY_TRIGGER mobs killed in that chunk
+
 # BLAZE: 40
-FARMED: 5
 DEFAULT: 20
 DEFAULT_BOSS: 30
+MINIMUM_REWARD: 4.0
+
+DECAY_RATE: 0.05
+
+# After how many seconds should the kill count for a chunk increase by one
+SECONDS_FOR_RECOVERY: 60
+
+# After how many mobs should the reward start decaying
+DECAY_TRIGGER: 10
+

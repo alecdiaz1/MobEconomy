@@ -1,6 +1,6 @@
 name: MobEconomy
 author: Alec Diaz
-version: 1.2.1
+version: 1.3.0
 main: me.alecdiaz.mobeconomy.MobEconomy
 description: Get money for killing mobs
 api-version: 1.15
